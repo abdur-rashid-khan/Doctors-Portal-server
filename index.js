@@ -64,7 +64,7 @@ async function run() {
       const result = await bookingCollection.insertOne(booking);
       return res.send({success:true,result});
     })
-
+    // 
   } finally {
     // await client.close();
   }
