@@ -52,11 +52,10 @@ async function run() {
       })
       res.send(services);
     })
-
     // for booking 
     app.post('/booking', async (req , res)=>{
       const booking = req.body;
-      const query = {treatment:booking.treatment , date:booking.date, patient:booking.patient  }
+      const query = {treatment:booking.treatment , date:booking.date, patientEmail:booking.patientEmail  }
       const cursor = await bookingCollection.findOne(query);
       if(cursor){
         return res.send({success:false,booking:cursor});
@@ -64,7 +63,13 @@ async function run() {
       const result = await bookingCollection.insertOne(booking);
       return res.send({success:true,result});
     })
-    // 
+    // booking
+    app.get('/booking', async(req , res )=>{
+      const patientEmail = req.query.patientEmail;
+      const query = {patientEmail : patientEmail};
+      const booking = await bookingCollection.find(query).toArray();
+      res.send(booking)
+    }) 
   } finally {
     // await client.close();
   }
