@@ -104,10 +104,24 @@ async function run() {
         $set: user,
       }
       const result = await userCollection.updateOne(filter, updateDos, option);
-      const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, { expiresIn: '1h' });
+      const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, { expiresIn: '24h' });
       res.send({ result, token });
     })
-
+    // admin making
+    app.put('/admin/:email', verifyToken , async (req, res) => {
+      const email = req.params.email;
+      const filter = { email: email };
+      const updateDos = {
+        $set: {roll:'admin'},
+      }
+      const result = await userCollection.updateOne(filter, updateDos);
+      res.send(result);
+    })
+    // total user load
+    app.get('/total-user', verifyToken , async (req , res )=>{
+      const result = await userCollection.find().toArray();
+      res.send(result);
+    })
   } finally {
     // await client.close();
   }
