@@ -108,14 +108,27 @@ async function run() {
       res.send({ result, token });
     })
     // admin making
-    app.put('/admin/:email', verifyToken , async (req, res) => {
+    app.put('/user/admin/:email', verifyToken, async (req, res) => {
       const email = req.params.email;
-      const filter = { email: email };
-      const updateDos = {
-        $set: {roll:'admin'},
+      const requester = req.decoded.email;
+      const requesterAccount = await userCollection.findOne({ email: requester })
+      if (requesterAccount.role === 'admin') {
+        const filter = { email: email };
+        const updateDos = {
+          $set: { role: 'admin' },
+        }
+        const result = await userCollection.updateOne(filter, updateDos);
+        res.send(result);
+      }else{
+        res.status(403).send({messages:'forbidden'});
       }
-      const result = await userCollection.updateOne(filter, updateDos);
-      res.send(result);
+    })
+    // admin
+    app.get('/admin/:email',async(req , res )=>{
+      const email = req.params.email;
+      const user = await userCollection.findOne({email:email});
+      const isAmin = user.role === 'admin';
+      res.send({admin:isAmin});
     })
     // total user load
     app.get('/total-user', verifyToken , async (req , res )=>{
@@ -131,3 +144,30 @@ run().catch(console.dir);
 app.listen(port, () => {
   console.log(`localhost ${port}`)
 })
+
+
+// this code for checking admin and added admin 
+
+
+// app.put('user/admin/:email', verifyToken, async (req, res) => {
+//   const email = req.params.email;
+//   const requester = req.decoded.email;
+//   const requesterAccount = await userCollection.findOne({ email: requester })
+//   if (requesterAccount.role === 'admin') {
+//     const filter = { email: email };
+//     const updateDos = {
+//       $set: { role: 'admin' },
+//     }
+//     const result = await userCollection.updateOne(filter, updateDos);
+//     res.send(result);
+//   }else{
+//     res.status(403).send({messages:'forbidden'});
+//   }
+// })
+// // admin
+// app.get('/admin/:email',async(req , res )=>{
+//   const email = req.params.email;
+//   const user = await userCollection.findOne({email:email});
+//   const isAmin = user.role === 'admin';
+//   res.send({admin:isAmin});
+// })
