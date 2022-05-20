@@ -52,6 +52,13 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     })
+    // services get for name and useing for add doctor specialty
+    app.get('/specialty', async (req, res) => {
+      const query = {};
+      const cursor = servicesCollection.find(query).project({name:1});
+      const result = await cursor.toArray();
+      res.send(result);
+    })
     // get booking 
     app.get('/available', async (req, res) => {
       const date = req.query.date || 'May 17, 2022';
@@ -90,8 +97,8 @@ async function run() {
         const query = { patientEmail: patientEmail };
         const booking = await bookingCollection.find(query).toArray();
         return res.send(booking)
-      }else{
-        return res.status(403).send({messages:'Forbidden access'})
+      } else {
+        return res.status(403).send({ messages: 'Forbidden access' })
       }
     })
     //put user data 
@@ -119,19 +126,19 @@ async function run() {
         }
         const result = await userCollection.updateOne(filter, updateDos);
         res.send(result);
-      }else{
-        res.status(403).send({messages:'forbidden'});
+      } else {
+        res.status(403).send({ messages: 'forbidden' });
       }
     })
     // admin
-    app.get('/admin/:email',async(req , res )=>{
+    app.get('/admin/:email', async (req, res) => {
       const email = req.params.email;
-      const user = await userCollection.findOne({email:email});
+      const user = await userCollection.findOne({ email: email });
       const isAmin = user.role === 'admin';
-      res.send({admin:isAmin});
+      res.send({ admin: isAmin });
     })
     // total user load
-    app.get('/total-user', verifyToken , async (req , res )=>{
+    app.get('/total-user', verifyToken, async (req, res) => {
       const result = await userCollection.find().toArray();
       res.send(result);
     })
@@ -146,7 +153,7 @@ app.listen(port, () => {
 })
 
 
-// this code for checking admin and added admin 
+// this code for checking admin and added admin
 
 
 // app.put('user/admin/:email', verifyToken, async (req, res) => {
